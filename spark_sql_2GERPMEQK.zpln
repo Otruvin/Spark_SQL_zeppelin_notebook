@@ -1,0 +1,693 @@
+﻿{
+  "paragraphs": [
+    {
+      "text": "%md\n\n# Top rated movies by genres\n\nThe script allows user to get a list of movies sorted by rating and filtered by conditions that entered was entered.\n\n### Requirements\n\n* Ubuntu 18.04 LTS\n* Hadoop 3.2\n* Spark 3.1\n\n### Usage\n\nUser can set parameters for search to input form under search data block.\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-12T18:16:50+0300",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 14,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h1>Top rated movies by genres</h1>\n<p>The script allows user to get a list of movies sorted by rating and filtered by conditions that entered was entered.</p>\n<h3>Requirements</h3>\n<ul>\n<li>Ubuntu 18.04 LTS</li>\n<li>Hadoop 3.2</li>\n<li>Spark 3.1</li>\n</ul>\n<h3>Usage</h3>\n<p>User can set parameters for search to input form under search data block.</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631459770307_444691903",
+      "id": "paragraph_1631324544062_1900380555",
+      "dateCreated": "2021-09-12T18:16:10+0300",
+      "dateStarted": "2021-09-12T18:16:50+0300",
+      "dateFinished": "2021-09-12T18:16:50+0300",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:351"
+    },
+    {
+      "text": "%sh\n\nmkdir -p tmp",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-16T14:25:06+0300",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sh",
+        "fontSize": 14,
+        "editorHide": false,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631791471761_788439786",
+      "id": "paragraph_1631791471761_788439786",
+      "dateCreated": "2021-09-16T14:24:31+0300",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:2234",
+      "dateFinished": "2021-09-16T14:25:06+0300",
+      "dateStarted": "2021-09-16T14:25:06+0300",
+      "title": "Create tmp folder",
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      }
+    },
+    {
+      "title": "Download data and calculate CRC for each file",
+      "text": "%sh\n\nURL_MOVIES=https://files.grouplens.org/datasets/movielens/ml-latest-small.zip\n\ndownloadData () {\n    if [ ! -f \"$(pwd)/tmp/data.zip\" ]; then\n        curl -s $URL_MOVIES -o \"$(pwd)/tmp/data.zip\"\n    fi\n}\n\nremoveTmpArchives () {\n    if [ -d \"$(pwd)/tmp/data_temp\" ]; then\n        rm -rf \"$(pwd)/tmp/data_temp\"\n    fi\n    if [ -f \"$(pwd)/tmp/data.zip\" ]; then\n\t    rm \"$(pwd)/tmp/data.zip\"\n\tfi\n}\n\ngetCrcFile () {\n    output=($(cksum $(pwd)/tmp/$1))\n    echo $output\n}\n\ngetFile () {\n    if [ ! -f \"$(pwd)/tmp/$1\" ]; then\n        putDataToTmp $1\n    fi\n}\n\ngetCRCFile () {\n    if [ ! -f \"$(pwd)/tmp/$1\" ]; then\n        getCrcFile $2 > $(pwd)/tmp/$1\n    fi\n}\n\nputDataToTmp () {\n    unzip -o \"$(pwd)/tmp/data.zip\" ml-latest-small/$1 -d \"$(pwd)/tmp/data_temp\"> /dev/null\n\tmv \"$(pwd)/tmp/data_temp/ml-latest-small/$1\" \"$(pwd)/tmp\"\n}\n\ngetAllFiles () {\n    if [ ! -f \"$(pwd)/tmp/$1\" ] || [ ! -f \"$(pwd)/tmp/$2\" ]; then\n        downloadData\n    fi\n    getFile $1\n    getFile $2\n    removeTmpArchives\n}\n\nif [ ! -f \"$(pwd)/tmp/moviesCRC.txt\" ] || [ ! -f \"$(pwd)/tmp/ratingsCRC.txt\" ]; then\n    getAllFiles movies.csv ratings.csv\n    getCRCFile moviesCRC.txt movies.csv\n    getCRCFile ratingsCRC.txt ratings.csv\n    \nelse\n    getAllFiles movies.csv ratings.csv\nfi\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-16T14:25:28+0300",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sh",
+        "fontSize": 14,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631459770308_3434559",
+      "id": "paragraph_1631231973512_1580866621",
+      "dateCreated": "2021-09-12T18:16:10+0300",
+      "dateStarted": "2021-09-12T18:16:50+0300",
+      "dateFinished": "2021-09-12T18:16:52+0300",
+      "status": "FINISHED",
+      "$$hashKey": "object:352"
+    },
+    {
+      "text": "%sh\n\nURL_MOVIES=https://files.grouplens.org/datasets/movielens/ml-latest-small.zip\n\nCRC_SMALL_MOVIES=$(cat $(pwd)/tmp/moviesCRC.txt)\nCRC_SMALL_RATINGS=$(cat $(pwd)/tmp/ratingsCRC.txt)\n\nremoveTmpArchives () {\n    if [ -d \"$(pwd)/tmp/data_temp\" ]; then\n        rm -rf \"$(pwd)/tmp/data_temp\"\n    fi\n    if [ -f \"$(pwd)/tmp/data.zip\" ]; then\n\t    rm \"$(pwd)/tmp/data.zip\"\n\tfi\n}\n\ndownloadData () {\n    if [ ! -f \"$(pwd)/tmp/data.zip\" ]; then\n        curl -s $URL_MOVIES -o \"$(pwd)/tmp/data.zip\"\n    fi\n}\n\nputDataToTmp () {\n    unzip -o \"$(pwd)/tmp/data.zip\" ml-latest-small/$1 -d \"$(pwd)/tmp/data_temp\"> /dev/null\n\tmv \"$(pwd)/tmp/data_temp/ml-latest-small/$1\" \"$(pwd)/tmp\"\n}\n\ngetCrcFile () {\n\toutput=($(cksum $(pwd)/tmp/$1))\n    echo $output\n}\n\ncheckDownloadSingleFile () {\n    if [ -f \"$(pwd)/tmp/$1\" ]; then\n    \tif [ \"$(getCrcFile $1)\" != \"$2\" ]; then\n    \t\trm \"$(pwd)/tmp/$1\"\n    \t\tdownloadData\n    \t\tputDataToTmp $1\n    \tfi\n    else\n        downloadData\n        putDataToTmp $1\n    fi\n}\n\ncheckDownloadSingleFile movies.csv $CRC_SMALL_MOVIES\ncheckDownloadSingleFile ratings.csv $CRC_SMALL_RATINGS\nremoveTmpArchives",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-16T14:26:17+0300",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sh",
+        "fontSize": 14,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631791549812_94072558",
+      "id": "paragraph_1631791549812_94072558",
+      "dateCreated": "2021-09-16T14:25:49+0300",
+      "status": "READY",
+      "focus": true,
+      "$$hashKey": "object:2341",
+      "title": "Verify downloaded files by CRC or download data"
+    },
+    {
+      "title": "Put data to hdfs",
+      "text": "%sh\n\nCRC_SMALL_MOVIES=$(cat $(pwd)/tmp/moviesCRC.txt)\nCRC_SMALL_RATINGS=$(cat $(pwd)/tmp/ratingsCRC.txt)\n\nputDataToHDFS () {\n\thdfs dfs -put $(pwd)/tmp/$1 /tmp/$2 > /dev/null\n}\n\ncheckIfFileExists () {\n\thdfs dfs -test -e /tmp/$1 && echo $?\n}\n\ngetCrcData () {\n\toutput=($(hdfs dfs -cat /tmp/data_ratings.csv|cksum))\n\techo $output\n}\n\nremoveDataFromHDFS () {\n\thdfs dfs -rm /tmp/$1 > /dev/null\n}\n\nputData () {\n    if [ \"$(checkIfFileExists $1)\" = \"0\" ]; then\n        if [ \"$(getCrcData $1)\" != \"$3\" ]; then\n            hdfs dfs -rm /tmp/$1\n            putDataToHDFS $2 $1\n        fi\n    else\n        putDataToHDFS $2 $1\n    fi\n}\n\nputData data_movies.csv movies.csv $CRC_SMALL_MOVIES\nputData data_ratings.csv ratings.csv $CRC_SMALL_RATINGS\n\nrm -r $(pwd)/tmp/movies.csv\nrm -r $(pwd)/tmp/ratings.csv",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-16T14:26:46+0300",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sh",
+        "fontSize": 14,
+        "title": true,
+        "results": {},
+        "enabled": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631459770308_1307318011",
+      "id": "paragraph_1631278291537_587670190",
+      "dateCreated": "2021-09-12T18:16:10+0300",
+      "status": "FINISHED",
+      "$$hashKey": "object:353"
+    },
+    {
+      "text": "%md\n\n### Constants for user",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-16T14:34:43+0300",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 14,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631792051151_785006780",
+      "id": "paragraph_1631792051151_785006780",
+      "dateCreated": "2021-09-16T14:34:11+0300",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:2431",
+      "dateFinished": "2021-09-16T14:34:43+0300",
+      "dateStarted": "2021-09-16T14:34:43+0300",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h3>Constants for user</h3>\n\n</div>"
+          }
+        ]
+      }
+    },
+    {
+      "title": "Local paths",
+      "text": "%python\n\nimport os\n\npathToLocalFiles = \"file://\" + os.getcwd() + \"/tmp/\"\nz.put(\"moviesp\", pathToLocalFiles + \"movies.csv\")\nz.put(\"ratingsp\", pathToLocalFiles + \"ratings.csv\")",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-16T14:38:59+0300",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 6,
+        "editorMode": "ace/mode/python",
+        "fontSize": 14,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631459770308_59985985",
+      "id": "paragraph_1631279759504_191935255",
+      "dateCreated": "2021-09-12T18:16:10+0300",
+      "dateStarted": "2021-09-12T18:16:52+0300",
+      "dateFinished": "2021-09-12T18:16:52+0300",
+      "status": "FINISHED",
+      "$$hashKey": "object:354"
+    },
+    {
+      "text": "%python\n\nz.put(\"moviesp\", \"hdfs:///tmp/data_movies.csv\")\nz.put(\"ratingsp\", \"hdfs:///tmp/data_ratings.csv\")",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-16T14:40:51+0300",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 6,
+        "editorMode": "ace/mode/python",
+        "fontSize": 14,
+        "title": true,
+        "results": {},
+        "enabled": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631792307541_1717461886",
+      "id": "paragraph_1631792307541_1717461886",
+      "dateCreated": "2021-09-16T14:38:27+0300",
+      "status": "READY",
+      "focus": true,
+      "$$hashKey": "object:2628",
+      "title": "HDFS paths"
+    },
+    {
+      "title": "Drop tables if exists",
+      "text": "%sql\n\nDROP TABLE IF EXISTS movies;\nDROP TABLE IF EXISTS ratings;",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-12T18:16:52+0300",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 14,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631459770308_2145002072",
+      "id": "paragraph_1631280992600_1959932964",
+      "dateCreated": "2021-09-12T18:16:10+0300",
+      "dateStarted": "2021-09-12T18:16:52+0300",
+      "dateFinished": "2021-09-12T18:16:52+0300",
+      "status": "FINISHED",
+      "$$hashKey": "object:355"
+    },
+    {
+      "text": "%md\n\n### Create tables",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-16T14:41:42+0300",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 14,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h3>Create tables</h3>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631459770308_1758366502",
+      "id": "paragraph_1631288815944_1531236923",
+      "dateCreated": "2021-09-12T18:16:10+0300",
+      "dateStarted": "2021-09-16T14:41:42+0300",
+      "dateFinished": "2021-09-16T14:41:42+0300",
+      "status": "FINISHED",
+      "$$hashKey": "object:356"
+    },
+    {
+      "title": "Create movies table",
+      "text": "%sql(interpolate=true)\n\nCREATE TABLE movies\n(movieId int, title string, genres string)\nusing csv\noptions(header=true, path=\"{moviesp}\")",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-12T18:16:52+0300",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 6,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 14,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {
+          "pathLocalMovies": " pathLocalMovies"
+        },
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631459770308_862746814",
+      "id": "paragraph_1631278312410_1366366213",
+      "dateCreated": "2021-09-12T18:16:10+0300",
+      "dateStarted": "2021-09-12T18:16:52+0300",
+      "dateFinished": "2021-09-12T18:16:52+0300",
+      "status": "FINISHED",
+      "$$hashKey": "object:357"
+    },
+    {
+      "title": "Create ratings table",
+      "text": "%sql(interpolate=true)\n\nCREATE TABLE ratings\n(userId int, movieId int, rating DOUBLE, timestamp string)\nusing csv\noptions(header=true, path=\"{ratingsp}\")",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-12T18:16:52+0300",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 6,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 14,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631459770309_1982764992",
+      "id": "paragraph_1631284222248_1600578402",
+      "dateCreated": "2021-09-12T18:16:10+0300",
+      "dateStarted": "2021-09-12T18:16:52+0300",
+      "dateFinished": "2021-09-12T18:16:52+0300",
+      "status": "FINISHED",
+      "$$hashKey": "object:358"
+    },
+    {
+      "title": "Search data about movies",
+      "text": "%sql\n\nWITH\nnormalizedMovies AS (\n    SELECT\n        movieId,\n        REGEXP_EXTRACT(title, \"(.+)[ ]+[(](\\\\\\d{4})[)]\", 1) AS title,\n        REGEXP_EXTRACT(title, \"(.+)[ ]+\\\\\\((\\\\\\d{4})\\\\\\)\", 2) AS year,\n        genres\n    FROM movies\n    ),\nnoBadDataMovies AS (\n    SELECT *\n    FROM normalizedMovies\n    WHERE year IS NOT NULL AND genres NOT LIKE '(%'\n    ),\nsearchedMovies AS (\n    SELECT * \n    FROM noBadDataMovies \n    WHERE \n            ((${Year from = NULL} IS NULL) OR (year >= ${Year from = NULL}))\n        AND ((${Year to = NULL} IS NULL) OR (year <= ${Year to = NULL}))\n        AND ((${Regexp = NULL} IS NULL) OR (RLIKE(title, ${Regexp = NULL})))\n    ),\nmoviesWithRatings AS (\n    SELECT\n        m.title,\n        m.year,\n        m.genres,\n        AVG(r.rating) AS rating\n    FROM searchedMovies AS m\n    INNER JOIN ratings AS r\n    ON r.movieId = m.movieId\n    GROUP BY \n        m.title,\n        m.year,\n        m.genres\n    ),\nexplodedData AS (\n    SELECT \n        EXPLODE(SPLIT(genres, \"[|]\")) AS genre,\n        title,\n        year,\n        rating\n    FROM moviesWithRatings\n    ),\nsearchedGenres AS (\n    SELECT SPLIT(${Searching genres = NULL}, \"[|]\") AS sg\n    ),\nexplodedMoviesFiltered AS (\n    SELECT *\n    FROM explodedData\n    WHERE (${Searching genres = NULL} IS NULL) OR ARRAY_CONTAINS((SELECT sg FROM searchedGenres), genre)\n    ),\nnumberedRows AS (\n    SELECT *,\n        ROW_NUMBER() OVER(PARTITION BY genre ORDER BY rating DESC, year DESC, title) AS rank\n    FROM explodedMoviesFiltered\n    )\nSELECT \n    genre,\n    title,\n    year,\n    ROUND(rating, 1) AS rating\nFROM numberedRows\nWHERE (${N = NULL} IS NULL) OR (rank <= ${N = NULL})\nORDER BY genre, rank",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-12T18:16:52+0300",
+      "progress": 57,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 14,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 752,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "genre": "string",
+                      "title": "string",
+                      "year": "string",
+                      "rating": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "movieId",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "title",
+                  "index": 1,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {
+          "yearFrom": "yf",
+          "yf": "0",
+          "Searching genres": "'Drama|Children'",
+          "Year from": "1990",
+          "Year to": "NULL",
+          "Regexp": "'war'",
+          "N": "NULL"
+        },
+        "forms": {
+          "Year from": {
+            "type": "TextBox",
+            "name": "Year from",
+            "displayName": "Year from",
+            "defaultValue": " NULL",
+            "hidden": false,
+            "$$hashKey": "object:673"
+          },
+          "Year to": {
+            "type": "TextBox",
+            "name": "Year to",
+            "displayName": "Year to",
+            "defaultValue": " NULL",
+            "hidden": false,
+            "$$hashKey": "object:674"
+          },
+          "Regexp": {
+            "type": "TextBox",
+            "name": "Regexp",
+            "displayName": "Regexp",
+            "defaultValue": " NULL",
+            "hidden": false,
+            "$$hashKey": "object:675"
+          },
+          "Searching genres": {
+            "type": "TextBox",
+            "name": "Searching genres",
+            "displayName": "Searching genres",
+            "defaultValue": " NULL",
+            "hidden": false,
+            "$$hashKey": "object:676"
+          },
+          "N": {
+            "type": "TextBox",
+            "name": "N",
+            "displayName": "N",
+            "defaultValue": " NULL",
+            "hidden": false,
+            "$$hashKey": "object:677"
+          }
+        }
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "genre\ttitle\tyear\trating\nChildren\tHomeward Bound II: Lost in San Francisco\t1996\t3.6\nChildren\tHomeward Bound: The Incredible Journey\t1993\t3.0\nDrama\tWhy Don't You Play In Hell? (Jigoku de naze warui)\t2013\t4.3\nDrama\tAssassination of Jesse James by the Coward Robert Ford, The\t2007\t4.1\nDrama\tHowards End\t1992\t4.0\nDrama\tEdward Scissorhands\t1990\t3.7\nDrama\tPay It Forward\t2000\t3.4\nDrama\tHomeward Bound: The Incredible Journey\t1993\t3.0\nDrama\tBlack Book (Zwartboek)\t2006\t2.5\nDrama\tSpring Forward\t1999\t2.0\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://192.168.1.50:4040/jobs/job?id=355",
+              "$$hashKey": "object:1255"
+            },
+            {
+              "jobUrl": "http://192.168.1.50:4040/jobs/job?id=357",
+              "$$hashKey": "object:1256"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631459770310_1464288103",
+      "id": "paragraph_1631278497392_1613131787",
+      "dateCreated": "2021-09-12T18:16:10+0300",
+      "dateStarted": "2021-09-12T18:16:52+0300",
+      "dateFinished": "2021-09-12T18:16:54+0300",
+      "status": "FINISHED",
+      "$$hashKey": "object:362"
+    },
+    {
+      "text": "%sql\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-09-12T18:16:54+0300",
+      "progress": 0,
+      "config": {
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1631459770310_1415645653",
+      "id": "paragraph_1631282318804_143158634",
+      "dateCreated": "2021-09-12T18:16:10+0300",
+      "dateStarted": "2021-09-12T18:16:54+0300",
+      "dateFinished": "2021-09-12T18:16:54+0300",
+      "status": "FINISHED",
+      "$$hashKey": "object:363"
+    }
+  ],
+  "name": "spark_sql",
+  "id": "2GERPMEQK",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.10.0",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false,
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {},
+  "path": "/spark_sql"
+}
